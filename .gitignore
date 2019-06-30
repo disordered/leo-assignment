@@ -31,3 +31,6 @@
 
 # Ignore OS files
 .DS_Store
+
+# Ignore Intellij generated files
+/.generators
