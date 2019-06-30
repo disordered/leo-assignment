@@ -90,6 +90,42 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, json.size, 'Should have returned empty json'
   end
 
+  test 'list limits response to page size' do
+    (ImagesController::DEFAULT_PAGE_SIZE + 1).times do
+      create_image(SMALL_JPG)
+    end
+
+    get images_url
+    assert_response :ok
+
+    json = JSON.parse(response.body, symbolize_names: true)
+    assert_equal ImagesController::DEFAULT_PAGE_SIZE, json.size, 'Items in result does not match page size'
+
+    headers = response.headers
+    assert_equal 1, headers['Current-Page'], 'Should be on first page'
+    assert_equal ImagesController::DEFAULT_PAGE_SIZE, headers['Page-Items'], 'Page size should match'
+    assert_equal 2, headers['Total-Pages'], 'Should have two pages'
+    assert_equal ImagesController::DEFAULT_PAGE_SIZE + 1, headers['Total-Count'], 'Total record count does not match'
+  end
+
+  test 'list can paginate' do
+    (ImagesController::DEFAULT_PAGE_SIZE + 1).times do
+      create_image(SMALL_JPG)
+    end
+
+    get images_url, params: { page: 2 }
+    assert_response :ok
+
+    json = JSON.parse(response.body, symbolize_names: true)
+    assert_equal 1, json.size, 'There should be only one item on second page'
+
+    headers = response.headers
+    assert_equal 2, headers['Current-Page'], 'Should be on second page'
+    assert_equal ImagesController::DEFAULT_PAGE_SIZE, headers['Page-Items'], 'Page size should match'
+    assert_equal 2, headers['Total-Pages'], 'Should have two pages'
+    assert_equal ImagesController::DEFAULT_PAGE_SIZE + 1, headers['Total-Count'], 'Total record count does not match'
+  end
+
   private
 
   # Compares data, size, filename and mime type of provided fixture name against provided image record

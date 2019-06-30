@@ -17,6 +17,7 @@ gem 'puma', '~> 3.11'
 # gem 'bcrypt', '~> 3.1.7'
 
 gem 'mimemagic', '~> 0.3.3'
+gem 'pagy', '~> 3.3.0'
 
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'

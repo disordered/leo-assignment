@@ -1,5 +1,12 @@
+require 'pagy'
+require 'pagy/extras/headers'
+
 # Provides CRUD operations for "/images/" path.
 class ImagesController < ApplicationController
+  include Pagy::Backend
+
+  DEFAULT_PAGE_SIZE = 5
+
   # POST /images
   def create
     file = params[:image]
@@ -39,7 +46,13 @@ class ImagesController < ApplicationController
 
   # GET /images
   def index
-    render json: Image.pluck(:id, :filename, :size, :mime_type).map { |id, filename, size, mime_type|
+    # Overriding default page size in the interest of time
+    # This will disable client specified page size
+    pagy, records = pagy(Image.all, items: DEFAULT_PAGE_SIZE)
+
+    # Add RFC-8288 pagination support
+    pagy_headers_merge(pagy)
+    render json: records.pluck(:id, :filename, :size, :mime_type).map { |id, filename, size, mime_type|
       {
           location: image_url(id),
           id: id,
