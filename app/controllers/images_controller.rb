@@ -36,4 +36,17 @@ class ImagesController < ApplicationController
       image.destroy
     end
   end
+
+  # GET /images
+  def index
+    render json: Image.pluck(:id, :filename, :size, :mime_type).map { |id, filename, size, mime_type|
+      {
+          location: image_url(id),
+          id: id,
+          filename: filename,
+          size: size,
+          mime_type: mime_type
+      }
+    }
+  end
 end

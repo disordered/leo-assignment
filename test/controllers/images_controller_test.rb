@@ -62,6 +62,34 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, Image.where(id: [image1, image2]).count, 'Incorrect image deleted'
   end
 
+  test 'list returns a list of image meta data' do
+    expected_json = []
+    3.times do
+      image = create_image(SMALL_JPG)
+      expected_json << {
+          location: image_url(image.id),
+          id: image.id,
+          filename: image.filename,
+          size: image.size,
+          mime_type: image.mime_type
+      }
+    end
+
+    get images_url
+    assert_response :ok
+
+    json = JSON.parse(response.body, symbolize_names: true)
+    assert_equal expected_json, json
+  end
+
+  test 'list returns empty when there are no images' do
+    get images_url
+    assert_response :ok
+
+    json = JSON.parse(response.body, symbolize_names: true)
+    assert_equal 0, json.size, 'Should have returned empty json'
+  end
+
   private
 
   # Compares data, size, filename and mime type of provided fixture name against provided image record
