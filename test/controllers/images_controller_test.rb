@@ -49,6 +49,19 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_response_contains_error
   end
 
+  test 'delete removes specified record' do
+    image1 = create_image(SMALL_JPG)
+    image2 = create_image(SMALL_JPG)
+    deleted_image = create_image(SMALL_JPG)
+
+    assert_difference 'Image.count', -1 do
+      delete image_url(deleted_image)
+    end
+
+    assert_response :no_content
+    assert_equal 2, Image.where(id: [image1, image2]).count, 'Incorrect image deleted'
+  end
+
   private
 
   # Compares data, size, filename and mime type of provided fixture name against provided image record

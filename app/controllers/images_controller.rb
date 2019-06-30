@@ -25,4 +25,15 @@ class ImagesController < ApplicationController
       send_data image.data, filename: image.filename, content_type: image.mime_type
     end
   end
+
+  # DELETE /images/:id
+  def destroy
+    id = params[:id]
+    image = Image.find_by_id(id)
+    if image.nil?
+      render json: { error: "Image with id '#{id}' not found"}, status: :not_found
+    else
+      image.destroy
+    end
+  end
 end
