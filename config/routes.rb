@@ -1,3 +1,4 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  # Will provide CRUD operations for /images/. Exclude PATCH/PUT as we don't want to allow modification of images
+  resources :images, except: :update
 end
